@@ -7,9 +7,7 @@ In the project directory run "composer install". Make a copy of the
 .env.example file and rename the copy .env then fill in the fields
 according to your configuration.
 
-After that, just to make sure everything is good, run the following commands:
+After that, just to make sure everything is good, run "php artisan key:generate"
 
-php artisan key:generate
-
-After that you can run "php artisan migrate" if you need to set up the
+Then you can run "php artisan migrate" if you need to set up the
 database then "php artisan serve" to run! Have fun!
