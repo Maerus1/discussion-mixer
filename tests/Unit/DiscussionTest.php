@@ -5,10 +5,14 @@ namespace Tests\Unit;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App;
+use App\Discussion;
+use Illuminate\Http\Request;
 
 class DiscussionTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * Create a discussion
      *
@@ -16,7 +20,21 @@ class DiscussionTest extends TestCase
      */
     public function testCreateDiscussion()
     {
-        $this->assertTrue(true);
+        //arrange
+        $user_id = factory(App\User::class)->create()->id;
+        $request = new Request();
+        $request_data = [
+            'user_id' => $user_id,
+            'name' => 'A great discussion!',
+            'description' => 'I have no idea how this discussion is gonna go!'
+        ];
+        $request->replace($request_data);
+
+        //act
+        Discussion::createDiscussion($request);
+
+        //assert
+        $this->assertDatabaseHas('discussions', $request_data);
     }
 
     /**
