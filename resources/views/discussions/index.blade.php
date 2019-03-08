@@ -2,10 +2,10 @@
 
 @section('content')
 @foreach ($discussions as $discussion)
-  <div class="text-center">
-    <p>{{ $discussion->name }}</p>
-    <p>{{ $discussion->user->name }}</p>
-  </div>  
+  <a href="{{ route('discussions.show', $discussion->id) }}" class="text-center">
+    <h4>{{ $discussion->name }}</h4>
+    <p>{{ $discussion->description }}</p>
+  </a>  
   <hr />
 @endforeach
 {{ $discussions->links() }}

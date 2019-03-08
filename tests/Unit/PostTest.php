@@ -47,19 +47,25 @@ class PostTest extends TestCase
         $discussion = $user->discussions()->save(factory(\App\Discussion::class)->make());
         $request = new Request();
         $request_data = [
-            'user_id' => $user->id,
             'discussion_id' => $discussion->id,
             'name' => 'An interesting thought!',
             'description' => 'Prepare yourself for this idea of mine!',
             'content' => 'I knew a man once who said to me that you ' .
                 'can do anything you set your mind to. I knew this wasn\'t ' .
                 'true strictly speaking but I indulged him anyways, he has ' .
-                'some interesting ideas.'
+                'some interesting ideas.',
+            'archived' => $discussion->archived
         ];
         $request->replace($request_data);
 
+        //mock a signed in user
+        $this->actingAs($user);
+
         //act
-        $discussion->insertPost($request);
+        Post::insertPost($request);
+
+        //since posts has no archived property, pop it off
+        array_pop($request_data);
 
         //assert
         $this->assertDatabaseHas('posts', $request_data);
@@ -86,7 +92,7 @@ class PostTest extends TestCase
                 'some interesting ideas.'
         ];
         $request->replace($request_data);
-
+        
         //act
         $post->updatePost($request);
 
@@ -108,17 +114,27 @@ class PostTest extends TestCase
         ]));
         $request = new Request();
         $request_data = [
+            'discussion_id' => $discussion->id,
             'name' => 'An interesting thought!',
             'description' => 'Prepare yourself for this idea of mine!',
             'content' => 'I knew a man once who said to me that you ' .
                 'can do anything you set your mind to. I knew this wasn\'t ' .
                 'true strictly speaking but I indulged him anyways, he has ' .
-                'some interesting ideas.'
+                'some interesting ideas.',
+            'archived' => $discussion->archived
         ];
         $request->replace($request_data);
 
+        $expected = array_pop($request_data);
+
+        //mock a signed in user
+        $this->actingAs($user);
+        
         //act
-        $discussion->insertPost($request);
+        Post::insertPost($request);
+
+        //since posts has no archived property, pop it off
+        array_pop($request_data);
 
         //assert
         $this->assertDatabaseMissing('posts', $request_data);

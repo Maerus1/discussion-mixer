@@ -34,8 +34,8 @@ class Discussion extends Model
     {
         $request->validate([
             'user_id' => 'required',
-            'name' => 'required',
-            'description' => 'required'
+            'name' => ['required', 'max:255'],
+            'description' => ['required', 'max:255']
         ]);
 
         //update all discussions for a user to set 'archived' to true
@@ -55,8 +55,8 @@ class Discussion extends Model
         $request->validate([
             'user_id' => 'required',
             'id' => 'required',
-            'name' => 'required',
-            'description' => 'required'
+            'name' => ['required', 'max:255'],
+            'description' => ['required', 'max:255']
         ]);
         
         //only update a discussion that belongs to the
@@ -67,23 +67,5 @@ class Discussion extends Model
             'name',
             'description'
         ]));
-    }
-
-    public function insertPost($request)
-    {
-        $request->validate([
-            'content' => 'required'
-        ]);
-
-        if(!$this->archived){
-            $this->posts()->create([
-                    'discussion_id' => $this->id, 
-                    'user_id' => $this->user_id
-                ] + $request->only([
-                'name',
-                'description',
-                'content'
-            ]));
-        }
     }
 }

@@ -48,7 +48,9 @@ class DiscussionController extends Controller
      */
     public function show(Discussion $discussion)
     {
-        return view('discussions.show');
+        return view('discussions.show', [
+            'discussion' => $discussion
+        ]);
     }
 
     /**
@@ -59,7 +61,9 @@ class DiscussionController extends Controller
      */
     public function edit(Discussion $discussion)
     {
-        return view('discussions.edit');
+        return view('discussions.edit', [
+            'discussion' => $discussion
+        ]);
     }
 
     /**

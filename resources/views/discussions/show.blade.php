@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-Show
+@foreach ($discussion->posts as $post)
+    <p>{{ $post->content }}</p>
+@endforeach
 @endsection
