@@ -14,7 +14,7 @@ class AddColumnsToDiscussionsTable extends Migration
     public function up()
     {
         Schema::table('discussions', function (Blueprint $table) {
-            $table->unsignedInteger('user_id')->default(0);
+            $table->bigInteger('user_id')->unsigned()->default(0);
             $table->string('name')->default('');
             $table->string('description')->default('');
 

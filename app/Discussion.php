@@ -8,6 +8,16 @@ class Discussion extends Model
 {
     protected $fillable = ['user_id', 'name', 'description'];
 
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public static function getActiveDiscussions()
     {
         return Discussion::where('archived', false)
@@ -33,9 +43,10 @@ class Discussion extends Model
             ->update(['archived' => true]);
         
         //create a new discussion with 'archived' set to false
-        Discussion::create($request->except([
-            '_token', 
-            '_method'
+        Discussion::create($request->only([
+            'user_id',
+            'name',
+            'description'
         ]));
     }
 
@@ -52,11 +63,27 @@ class Discussion extends Model
         //user requesting the change
         Discussion::where('id', $request->id)
             ->where('user_id', $request->user_id)
-            ->update($request->except([
-            '_token',
-            '_method',
-            'user_id',
-            'id'
+            ->update($request->only([
+            'name',
+            'description'
         ]));
+    }
+
+    public function insertPost($request)
+    {
+        $request->validate([
+            'content' => 'required'
+        ]);
+
+        if(!$this->archived){
+            $this->posts()->create([
+                    'discussion_id' => $this->id, 
+                    'user_id' => $this->user_id
+                ] + $request->only([
+                'name',
+                'description',
+                'content'
+            ]));
+        }
     }
 }

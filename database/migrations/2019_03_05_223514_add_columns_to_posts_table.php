@@ -14,11 +14,11 @@ class AddColumnsToPostsTable extends Migration
     public function up()
     {
         Schema::table('posts', function (Blueprint $table) {
-            $table->unsignedInteger('user_id')->default(0);
-            $table->unsignedInteger('discussion_id')->default(0);
-            $table->string('name')->default('');
-            $table->string('description')->default('');
-            $table->text('content')->default('');
+            $table->bigInteger('user_id')->unsigned()->default(0);
+            $table->bigInteger('discussion_id')->unsigned()->default(0);
+            $table->string('name')->nullable()->default('');
+            $table->string('description')->nullable()->default('');
+            $table->text('content')->nullable();
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('discussion_id')->references('id')->on('discussions');
         });

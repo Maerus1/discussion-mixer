@@ -12,9 +12,7 @@ class DiscussionsTableSeeder extends Seeder
     public function run()
     {
         App\User::all()->each(function($user){
-            factory(App\Discussion::class)->create([
-                'user_id' => $user->id
-            ]);
+            $user->discussions()->save(factory(App\Discussion::class)->make());
         });
     }
 }
