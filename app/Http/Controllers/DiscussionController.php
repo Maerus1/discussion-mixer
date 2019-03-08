@@ -14,7 +14,9 @@ class DiscussionController extends Controller
      */
     public function index()
     {
-        //
+        return view('discussions.index', [
+            'discussions' => Discussion::paginate(10)
+        ]);
     }
 
     /**
@@ -24,7 +26,7 @@ class DiscussionController extends Controller
      */
     public function create()
     {
-        //
+        return view('discussions.create');
     }
 
     /**
@@ -35,7 +37,7 @@ class DiscussionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        return view('discussions.store');
     }
 
     /**
@@ -46,7 +48,7 @@ class DiscussionController extends Controller
      */
     public function show(Discussion $discussion)
     {
-        //
+        return view('discussions.show');
     }
 
     /**
@@ -57,7 +59,7 @@ class DiscussionController extends Controller
      */
     public function edit(Discussion $discussion)
     {
-        //
+        return view('discussions.edit');
     }
 
     /**
@@ -69,6 +71,6 @@ class DiscussionController extends Controller
      */
     public function update(Request $request, Discussion $discussion)
     {
-        //
+        return view('discussions.update');
     }
 }
