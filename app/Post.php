@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 class Post extends Model
 {
-    protected $fillable = ['user_id', 'discussion_id', 'name', 'description', 'content'];
+    protected $fillable = ['user_id', 'discussion_id', 'title', 'description', 'content'];
     
     public function discussion()
     {
@@ -21,15 +21,17 @@ class Post extends Model
 
     public function updatePost($request)
     {
-        $request->validate([
+        $items = $request->validate([
+            'user_id' => 'required',
+            'title' => 'max:255',
+            'description' => 'max:255',
             'content' => 'required'
         ]);
         
-        $this->update($request->only([
-            'name',
-            'description',
-            'content'
-        ]));
+        if($request->get('user_id') == Auth::id())
+        {
+            $this->update($items);
+        }
     }
 
     public static function insertPost($request)
@@ -37,7 +39,9 @@ class Post extends Model
         $request->validate([
             'discussion_id' => 'required',
             'content' => 'required',
-            'archived' => 'required'
+            'archived' => 'required',
+            'title' => 'max:255',
+            'description' => 'max:255',
         ]);
 
         if(!$request->get('archived')){
@@ -45,7 +49,7 @@ class Post extends Model
                     'user_id' => Auth::id()
                 ] + $request->only([
                 'discussion_id',
-                'name',
+                'title',
                 'description',
                 'content'
             ]));

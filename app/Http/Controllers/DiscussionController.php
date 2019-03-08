@@ -15,7 +15,8 @@ class DiscussionController extends Controller
     public function index()
     {
         return view('discussions.index', [
-            'discussions' => Discussion::paginate(10)
+            'discussions' => Discussion::where('archived', false)
+                                ->paginate(10)
         ]);
     }
 
@@ -37,7 +38,11 @@ class DiscussionController extends Controller
      */
     public function store(Request $request)
     {
-        return view('discussions.store');
+        Discussion::createDiscussion($request);
+        return view('discussions.index', [
+           'discussions' => Discussion::where('archived', false)
+                                ->paginate(10) 
+        ]);
     }
 
     /**

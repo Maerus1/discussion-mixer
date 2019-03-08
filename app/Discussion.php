@@ -3,10 +3,11 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Discussion extends Model
 {
-    protected $fillable = ['user_id', 'name', 'description'];
+    protected $fillable = ['user_id', 'title', 'description'];
 
     public function posts()
     {
@@ -18,54 +19,34 @@ class Discussion extends Model
         return $this->belongsTo(User::class);
     }
 
-    public static function getActiveDiscussions()
-    {
-        return Discussion::where('archived', false)
-            ->get();
-    }
-
-    public static function getArchivedDiscussions()
-    {
-        return Discussion::where('archived', true)
-            ->get();
-    }
-
     public static function createDiscussion($request)
     {
-        $request->validate([
-            'user_id' => 'required',
-            'name' => ['required', 'max:255'],
-            'description' => ['required', 'max:255']
+        $items = $request->validate([
+            'title' => ['required', 'max:255'],
+            'description' => 'max:255'
         ]);
 
         //update all discussions for a user to set 'archived' to true
-        Discussion::where('user_id', $request->user_id)
+        Discussion::where('user_id', Auth::id())
             ->update(['archived' => true]);
         
         //create a new discussion with 'archived' set to false
-        Discussion::create($request->only([
-            'user_id',
-            'name',
-            'description'
-        ]));
+        Discussion::create([
+            'user_id' => Auth::id()
+        ] + $items);
     }
 
-    public static function updateDiscussion($request)
+    public function updateDiscussion($request)
     {
-        $request->validate([
+        $items = $request->validate([
             'user_id' => 'required',
-            'id' => 'required',
-            'name' => ['required', 'max:255'],
-            'description' => ['required', 'max:255']
+            'title' => ['required', 'max:255'],
+            'description' => 'max:255'
         ]);
-        
-        //only update a discussion that belongs to the
-        //user requesting the change
-        Discussion::where('id', $request->id)
-            ->where('user_id', $request->user_id)
-            ->update($request->only([
-            'name',
-            'description'
-        ]));
+
+        if($request->get('user_id') == Auth::id())
+        {
+            $this->update($items);
+        }
     }
 }

@@ -48,7 +48,7 @@ class PostTest extends TestCase
         $request = new Request();
         $request_data = [
             'discussion_id' => $discussion->id,
-            'name' => 'An interesting thought!',
+            'title' => 'An interesting thought!',
             'description' => 'Prepare yourself for this idea of mine!',
             'content' => 'I knew a man once who said to me that you ' .
                 'can do anything you set your mind to. I knew this wasn\'t ' .
@@ -76,7 +76,7 @@ class PostTest extends TestCase
      *
      * @return void
      */
-    public function testUpdatePostInDiscussion()
+    public function testUpdatePostInDiscussionSuccess()
     {
         //arrange
         $user = factory(\App\User::class)->create();
@@ -84,7 +84,8 @@ class PostTest extends TestCase
         $post = $discussion->posts()->save(factory(\App\Post::class)->make());
         $request = new Request();
         $request_data = [
-            'name' => 'An interesting thought!',
+            'user_id' => $user->id,
+            'title' => 'An interesting thought!',
             'description' => 'Prepare yourself for this idea of mine!',
             'content' => 'I knew a man once who said to me that you ' .
                 'can do anything you set your mind to. I knew this wasn\'t ' .
@@ -92,12 +93,48 @@ class PostTest extends TestCase
                 'some interesting ideas.'
         ];
         $request->replace($request_data);
+
+        //mock a signed in user
+        $this->actingAs($user);
         
         //act
         $post->updatePost($request);
 
         //assert
         $this->assertDatabaseHas('posts', $request_data);
+    }
+
+    /**
+     * Fail to update a post
+     *
+     * @return void
+     */
+    public function testUpdatePostInDiscussionFailure()
+    {
+        //arrange
+        $user = factory(\App\User::class)->create();
+        $discussion = $user->discussions()->save(factory(\App\Discussion::class)->make());
+        $post = $discussion->posts()->save(factory(\App\Post::class)->make());
+        $request = new Request();
+        $request_data = [
+            'user_id' => 999,
+            'title' => 'An interesting thought!',
+            'description' => 'Prepare yourself for this idea of mine!',
+            'content' => 'I knew a man once who said to me that you ' .
+                'can do anything you set your mind to. I knew this wasn\'t ' .
+                'true strictly speaking but I indulged him anyways, he has ' .
+                'some interesting ideas.'
+        ];
+        $request->replace($request_data);
+
+        //mock a signed in user
+        $this->actingAs($user);
+        
+        //act
+        $post->updatePost($request);
+
+        //assert
+        $this->assertDatabaseMissing('posts', $request_data);
     }
 
     /**
@@ -115,7 +152,7 @@ class PostTest extends TestCase
         $request = new Request();
         $request_data = [
             'discussion_id' => $discussion->id,
-            'name' => 'An interesting thought!',
+            'title' => 'An interesting thought!',
             'description' => 'Prepare yourself for this idea of mine!',
             'content' => 'I knew a man once who said to me that you ' .
                 'can do anything you set your mind to. I knew this wasn\'t ' .
