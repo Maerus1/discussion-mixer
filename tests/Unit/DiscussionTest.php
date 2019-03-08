@@ -5,7 +5,6 @@ namespace Tests\Unit;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App;
 use App\Discussion;
 use Illuminate\Http\Request;
 
@@ -22,8 +21,8 @@ class DiscussionTest extends TestCase
     {
         //arrange
         $objects_in_array = 10;
-        factory(App\User::class, $objects_in_array)->create();
-        factory(App\Discussion::class, $objects_in_array)->create();
+        factory(\App\User::class, $objects_in_array)->create();
+        factory(\App\Discussion::class, $objects_in_array)->create();
 
         //act
         $active_discussions = Discussion::getActiveDiscussions();
@@ -41,8 +40,8 @@ class DiscussionTest extends TestCase
     {
         //arrange
         $objects_in_array = 10;
-        factory(App\User::class, $objects_in_array)->create();
-        factory(App\Discussion::class, $objects_in_array)->create([
+        factory(\App\User::class, $objects_in_array)->create();
+        factory(\App\Discussion::class, $objects_in_array)->create([
             'archived' => true
         ]);
 
@@ -61,7 +60,7 @@ class DiscussionTest extends TestCase
     public function testCreateDiscussion()
     {
         //arrange
-        $user_id = factory(App\User::class)->create()->id;
+        $user_id = factory(\App\User::class)->create()->id;
         $request = new Request();
         $request_data = [
             'user_id' => $user_id,
@@ -85,7 +84,7 @@ class DiscussionTest extends TestCase
     public function testArchiveDiscussion()
     {
         //arrange
-        $user_id = factory(App\User::class)->create()->id;
+        $user_id = factory(\App\User::class)->create()->id;
 
         //form data for first discussion
         $first_request = new Request();
@@ -123,8 +122,8 @@ class DiscussionTest extends TestCase
     public function testUpdateDiscussionSuccess()
     {
         //arrange
-        $user_id = factory(App\User::class)->create()->id;
-        $discussion_id = factory(App\Discussion::class)->create([
+        $user_id = factory(\App\User::class)->create()->id;
+        $discussion_id = factory(\App\Discussion::class)->create([
             'user_id' => $user_id
         ])->id;
         $request = new Request();
@@ -150,8 +149,8 @@ class DiscussionTest extends TestCase
     public function testUpdateDiscussionFailure()
     {
         //arrange
-        factory(App\User::class)->create();
-        $discussion_id = factory(App\Discussion::class)->create()->id;
+        factory(\App\User::class)->create();
+        $discussion_id = factory(\App\Discussion::class)->create()->id;
         $request = new Request();
         $request->replace([
             'user_id' => 500,

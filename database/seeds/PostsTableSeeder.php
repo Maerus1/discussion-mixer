@@ -11,6 +11,10 @@ class PostsTableSeeder extends Seeder
      */
     public function run()
     {
-        factory(App\Post::class, 50)->create();
+        App\Discussion::all()->each(function($discussion){
+            $discussion->posts()->saveMany(factory(App\Post::class, 2)->make([
+                'user_id' => $discussion->user->id
+            ]));
+        });
     }
 }
