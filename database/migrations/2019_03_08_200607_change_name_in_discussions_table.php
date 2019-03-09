@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddColumnsToDiscussionsTable extends Migration
+class ChangeNameInDiscussionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,11 +14,7 @@ class AddColumnsToDiscussionsTable extends Migration
     public function up()
     {
         Schema::table('discussions', function (Blueprint $table) {
-            $table->bigInteger('user_id')->unsigned()->default(0);
-            $table->string('name')->default('');
-            $table->string('description')->default('');
-
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->renameColumn('name', 'title');
         });
     }
 
