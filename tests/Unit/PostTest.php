@@ -47,19 +47,25 @@ class PostTest extends TestCase
         $discussion = $user->discussions()->save(factory(\App\Discussion::class)->make());
         $request = new Request();
         $request_data = [
-            'user_id' => $user->id,
             'discussion_id' => $discussion->id,
-            'name' => 'An interesting thought!',
+            'title' => 'An interesting thought!',
             'description' => 'Prepare yourself for this idea of mine!',
             'content' => 'I knew a man once who said to me that you ' .
                 'can do anything you set your mind to. I knew this wasn\'t ' .
                 'true strictly speaking but I indulged him anyways, he has ' .
-                'some interesting ideas.'
+                'some interesting ideas.',
+            'archived' => $discussion->archived
         ];
         $request->replace($request_data);
 
+        //mock a signed in user
+        $this->actingAs($user);
+
         //act
-        $discussion->insertPost($request);
+        Post::insertPost($request);
+
+        //since posts has no archived property, pop it off
+        array_pop($request_data);
 
         //assert
         $this->assertDatabaseHas('posts', $request_data);
@@ -70,7 +76,7 @@ class PostTest extends TestCase
      *
      * @return void
      */
-    public function testUpdatePostInDiscussion()
+    public function testUpdatePostInDiscussionSuccess()
     {
         //arrange
         $user = factory(\App\User::class)->create();
@@ -78,7 +84,8 @@ class PostTest extends TestCase
         $post = $discussion->posts()->save(factory(\App\Post::class)->make());
         $request = new Request();
         $request_data = [
-            'name' => 'An interesting thought!',
+            'user_id' => $user->id,
+            'title' => 'An interesting thought!',
             'description' => 'Prepare yourself for this idea of mine!',
             'content' => 'I knew a man once who said to me that you ' .
                 'can do anything you set your mind to. I knew this wasn\'t ' .
@@ -87,11 +94,47 @@ class PostTest extends TestCase
         ];
         $request->replace($request_data);
 
+        //mock a signed in user
+        $this->actingAs($user);
+        
         //act
         $post->updatePost($request);
 
         //assert
         $this->assertDatabaseHas('posts', $request_data);
+    }
+
+    /**
+     * Fail to update a post
+     *
+     * @return void
+     */
+    public function testUpdatePostInDiscussionFailure()
+    {
+        //arrange
+        $user = factory(\App\User::class)->create();
+        $discussion = $user->discussions()->save(factory(\App\Discussion::class)->make());
+        $post = $discussion->posts()->save(factory(\App\Post::class)->make());
+        $request = new Request();
+        $request_data = [
+            'user_id' => 999,
+            'title' => 'An interesting thought!',
+            'description' => 'Prepare yourself for this idea of mine!',
+            'content' => 'I knew a man once who said to me that you ' .
+                'can do anything you set your mind to. I knew this wasn\'t ' .
+                'true strictly speaking but I indulged him anyways, he has ' .
+                'some interesting ideas.'
+        ];
+        $request->replace($request_data);
+
+        //mock a signed in user
+        $this->actingAs($user);
+        
+        //act
+        $post->updatePost($request);
+
+        //assert
+        $this->assertDatabaseMissing('posts', $request_data);
     }
 
     /**
@@ -108,17 +151,27 @@ class PostTest extends TestCase
         ]));
         $request = new Request();
         $request_data = [
-            'name' => 'An interesting thought!',
+            'discussion_id' => $discussion->id,
+            'title' => 'An interesting thought!',
             'description' => 'Prepare yourself for this idea of mine!',
             'content' => 'I knew a man once who said to me that you ' .
                 'can do anything you set your mind to. I knew this wasn\'t ' .
                 'true strictly speaking but I indulged him anyways, he has ' .
-                'some interesting ideas.'
+                'some interesting ideas.',
+            'archived' => $discussion->archived
         ];
         $request->replace($request_data);
 
+        $expected = array_pop($request_data);
+
+        //mock a signed in user
+        $this->actingAs($user);
+        
         //act
-        $discussion->insertPost($request);
+        Post::insertPost($request);
+
+        //since posts has no archived property, pop it off
+        array_pop($request_data);
 
         //assert
         $this->assertDatabaseMissing('posts', $request_data);

@@ -13,46 +13,6 @@ class DiscussionTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * Get all active discussions
-     *
-     * @return void
-     */
-    public function testGetAllActiveDiscussions()
-    {
-        //arrange
-        $objects_in_array = 10;
-        factory(\App\User::class, $objects_in_array)->create();
-        factory(\App\Discussion::class, $objects_in_array)->create();
-
-        //act
-        $active_discussions = Discussion::getActiveDiscussions();
-
-        //assert
-        $this->assertCount($objects_in_array, $active_discussions);
-    }
-
-    /**
-     * Get all archived discussions
-     *
-     * @return void
-     */
-    public function testGetAllArchivedDiscussions()
-    {
-        //arrange
-        $objects_in_array = 10;
-        factory(\App\User::class, $objects_in_array)->create();
-        factory(\App\Discussion::class, $objects_in_array)->create([
-            'archived' => true
-        ]);
-
-        //act
-        $archived_discussions = Discussion::getArchivedDiscussions();
-
-        //assert
-        $this->assertCount($objects_in_array, $archived_discussions);
-    }
-
-    /**
      * Create a discussion
      *
      * @return void
@@ -60,14 +20,16 @@ class DiscussionTest extends TestCase
     public function testCreateDiscussion()
     {
         //arrange
-        $user_id = factory(\App\User::class)->create()->id;
+        $user = factory(\App\User::class)->create();
         $request = new Request();
         $request_data = [
-            'user_id' => $user_id,
-            'name' => 'A great discussion!',
+            'title' => 'A great discussion!',
             'description' => 'I have no idea how this discussion is gonna go!'
         ];
         $request->replace($request_data);
+
+        //mock a signed in user
+        $this->actingAs($user);
 
         //act
         Discussion::createDiscussion($request);
@@ -84,23 +46,24 @@ class DiscussionTest extends TestCase
     public function testArchiveDiscussion()
     {
         //arrange
-        $user_id = factory(\App\User::class)->create()->id;
+        $user = factory(\App\User::class)->create();
 
         //form data for first discussion
         $first_request = new Request();
         $first_request->replace([
-            'user_id' => $user_id,
-            'name' => 'Who loves Canada?',
+            'title' => 'Who loves Canada?',
             'description' => 'I know I do, but I am looking for others'
         ]);
 
         //form data for second discussion
         $second_request = new Request();
         $second_request->replace([
-            'user_id' => $user_id,
-            'name' => 'Who loves the USA?',
+            'title' => 'Who loves the USA?',
             'description' => 'I am Canadian but I like everyone! What about others?'
         ]);
+
+        //mock a signed in user
+        $this->actingAs($user);
 
         //act
         //store first request
@@ -110,8 +73,8 @@ class DiscussionTest extends TestCase
         Discussion::createDiscussion($second_request);
 
         //assert first request archived attribute is true
-        $this->assertDatabaseHas('discussions', ['name' => 'Who loves Canada?', 'archived' => true]);
-        $this->assertDatabaseHas('discussions', ['name' => 'Who loves the USA?', 'archived' => false]);
+        $this->assertDatabaseHas('discussions', ['title' => 'Who loves Canada?', 'archived' => true]);
+        $this->assertDatabaseHas('discussions', ['title' => 'Who loves the USA?', 'archived' => false]);
     }
 
     /**
@@ -122,50 +85,55 @@ class DiscussionTest extends TestCase
     public function testUpdateDiscussionSuccess()
     {
         //arrange
-        $user_id = factory(\App\User::class)->create()->id;
-        $discussion_id = factory(\App\Discussion::class)->create([
-            'user_id' => $user_id
-        ])->id;
+        $user = factory(\App\User::class)->create();
+        $discussion = factory(\App\Discussion::class)->create([
+            'user_id' => $user->id
+        ]);
         $request = new Request();
         $request_data = [
-            'user_id' => $user_id,
-            'id' => $discussion_id,
-            'name' => 'What is your favourite colour?',
+            'user_id' => $user->id,
+            'title' => 'What is your favourite colour?',
             'description' => 'Our preferences are whispers testifying to our true diversity'
         ];
         $request->replace($request_data);
+
+        //mock a signed in user
+        $this->actingAs($user);
+
         //act
-        Discussion::updateDiscussion($request);
+        $discussion->updateDiscussion($request);
 
         //assert
         $this->assertDatabaseHas('discussions', $request_data);
     }
 
     /**
-     * Fail to update another users' discussion
+     * Fail to update a discussion
      *
      * @return void
      */
     public function testUpdateDiscussionFailure()
     {
         //arrange
-        factory(\App\User::class)->create();
-        $discussion_id = factory(\App\Discussion::class)->create()->id;
-        $request = new Request();
-        $request->replace([
-            'user_id' => 500,
-            'id' => $discussion_id,
-            'name' => 'Cats are pretty awesome!',
-            'description' => 'Dog people are welcome too, but cats reign supreme!'
+        $user = factory(\App\User::class)->create();
+        $discussion = factory(\App\Discussion::class)->create([
+            'user_id' => $user->id
         ]);
+        $request = new Request();
+        $request_data = [
+            'user_id' => 999,
+            'title' => 'What is your favourite colour?',
+            'description' => 'Our preferences are whispers testifying to our true diversity'
+        ];
+        $request->replace($request_data);
+
+        //mock a signed in user
+        $this->actingAs($user);
 
         //act
-        Discussion::updateDiscussion($request);
+        $discussion->updateDiscussion($request);
 
         //assert
-        $this->assertDatabaseMissing('discussions', [
-            'name' => 'Cats are pretty awesome!',
-            'description' => 'Dog people are welcome too, but cats reign supreme!'
-        ]);
+        $this->assertDatabaseMissing('discussions', $request_data);
     }
 }

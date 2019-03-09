@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 
 class DiscussionController extends Controller
 {
+    function __construct()
+    {
+        $this->middleware('auth');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -14,7 +18,10 @@ class DiscussionController extends Controller
      */
     public function index()
     {
-        //
+        return view('discussions.index', [
+            'discussions' => Discussion::where('archived', false)
+                                ->paginate(10)
+        ]);
     }
 
     /**
@@ -24,7 +31,7 @@ class DiscussionController extends Controller
      */
     public function create()
     {
-        //
+        return view('discussions.create');
     }
 
     /**
@@ -35,7 +42,11 @@ class DiscussionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Discussion::createDiscussion($request);
+        return view('discussions.index', [
+           'discussions' => Discussion::where('archived', false)
+                                ->paginate(10) 
+        ]);
     }
 
     /**
@@ -46,7 +57,9 @@ class DiscussionController extends Controller
      */
     public function show(Discussion $discussion)
     {
-        //
+        return view('discussions.show', [
+            'discussion' => $discussion
+        ]);
     }
 
     /**
@@ -57,7 +70,9 @@ class DiscussionController extends Controller
      */
     public function edit(Discussion $discussion)
     {
-        //
+        return view('discussions.edit', [
+            'discussion' => $discussion
+        ]);
     }
 
     /**
@@ -69,6 +84,9 @@ class DiscussionController extends Controller
      */
     public function update(Request $request, Discussion $discussion)
     {
-        //
+        $discussion->updateDiscussion($request);
+        return view('discussions.show', [
+            'discussion' => $discussion
+        ]);
     }
 }
