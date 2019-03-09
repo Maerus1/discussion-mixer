@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 
 class DiscussionController extends Controller
 {
+    function __construct()
+    {
+        $this->middleware('auth');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -80,6 +84,9 @@ class DiscussionController extends Controller
      */
     public function update(Request $request, Discussion $discussion)
     {
-        return view('discussions.update');
+        $discussion->updateDiscussion($request);
+        return view('discussions.show', [
+            'discussion' => $discussion
+        ]);
     }
 }

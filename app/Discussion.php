@@ -39,12 +39,11 @@ class Discussion extends Model
     public function updateDiscussion($request)
     {
         $items = $request->validate([
-            'user_id' => 'required',
             'title' => ['required', 'max:255'],
             'description' => 'max:255'
         ]);
 
-        if($request->get('user_id') == Auth::id())
+        if($this->user_id == Auth::id())
         {
             $this->update($items);
         }
