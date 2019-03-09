@@ -62,12 +62,12 @@ class PostTest extends TestCase
         $this->actingAs($user);
 
         //act
-        Post::insertPost($request);
-
+        Post::insertPost($request, $discussion->id);
+        
         //since posts has no archived property, pop it off
         array_pop($request_data);
 
-        //assert
+        //assert that the data is stored and a post object is returned
         $this->assertDatabaseHas('posts', $request_data);
     }
 
@@ -168,7 +168,7 @@ class PostTest extends TestCase
         $this->actingAs($user);
         
         //act
-        Post::insertPost($request);
+        Post::insertPost($request, $discussion->id);
 
         //since posts has no archived property, pop it off
         array_pop($request_data);

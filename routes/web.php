@@ -11,14 +11,23 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'DiscussionController@index')->middleware('auth');
 
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
 Route::resource('discussions', 'DiscussionController')->except([
+    'destroy'
+]);
+
+Route::post('posts/{post_id}', 'PostController@store')->name('posts.store.');
+
+Route::resource('posts', 'PostController')->except([
+    'store',
+    'index',
+    'create',
+    'show',
+    'edit',
     'destroy'
 ]);
