@@ -22,33 +22,30 @@ class Post extends Model
     public function updatePost($request)
     {
         $items = $request->validate([
-            'user_id' => 'required',
             'title' => 'max:255',
             'description' => 'max:255',
             'content' => 'required'
         ]);
-        
-        if($request->get('user_id') == Auth::id())
-        {
-            $this->update($items);
-        }
+
+        $this->update([
+            'user_id' => Auth::id()
+        ] + $items);
     }
 
-    public static function insertPost($request)
+    public static function insertPost($request, $discussion_id)
     {
         $request->validate([
-            'discussion_id' => 'required',
             'content' => 'required',
-            'archived' => 'required',
             'title' => 'max:255',
             'description' => 'max:255',
         ]);
 
-        if(!$request->get('archived')){
+        $discussion = Discussion::where('id', $discussion_id)->first();
+        if(!$discussion->archived){
             Post::create([
-                    'user_id' => Auth::id()
+                    'user_id' => Auth::id(),
+                    'discussion_id' => $discussion->id
                 ] + $request->only([
-                'discussion_id',
                 'title',
                 'description',
                 'content'

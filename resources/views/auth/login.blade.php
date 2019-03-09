@@ -2,6 +2,8 @@
 
 @section('content')
 <div class="container">
+    <h1 class="text-center">Welcome to Discussion Mixer!</h1>
+    <p class="text-center">Please login or register to continue</p>
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
