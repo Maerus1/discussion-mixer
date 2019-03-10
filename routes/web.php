@@ -31,3 +31,9 @@ Route::resource('posts', 'PostController')->except([
     'edit',
     'destroy'
 ]);
+
+Route::resource('users', 'UserController')->except([
+    'create',
+    'store',
+    'destroy'
+]);
