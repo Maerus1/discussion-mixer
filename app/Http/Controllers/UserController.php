@@ -8,15 +8,6 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
 
     /**
      * Display the specified resource.
@@ -53,6 +44,8 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        //add validation for updating
+        return view('users.show', [
+            'user' => $user->updateUser($request, $user)
+        ]);
     }
 }

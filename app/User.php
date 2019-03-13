@@ -41,4 +41,16 @@ class User extends Authenticatable
     {
         return $this->hasMany(Discussion::class);
     }
+
+    public function updateUser($request, $user){
+        $request->validate([
+            'name' => ['required', 'max:255'],
+            'email' => ['required', 'max:255']
+        ]);
+        $user->update($request->only([
+            'name',
+            'email'
+        ]));
+        return $user;
+    }
 }

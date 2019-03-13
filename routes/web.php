@@ -33,6 +33,7 @@ Route::resource('posts', 'PostController')->except([
 ]);
 
 Route::resource('users', 'UserController')->except([
+    'index',
     'create',
     'store',
     'destroy'
