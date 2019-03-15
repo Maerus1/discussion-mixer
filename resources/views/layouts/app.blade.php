@@ -22,6 +22,23 @@
         .pagination{
             justify-content: center;
         }
+        ul.pagination li a, ul.pagination li.page-item.active span {
+            background-color: #333;
+            color: #FFF;
+            border-color: #000;
+        }
+        ul.pagination li a:hover{
+            background-color: #CDC;
+            color: #000;
+        }
+        ul.pagination li.page-item.active span {
+            border-color: #777;
+        }
+        a:hover {
+            text-decoration: none;
+            background-color: rgba(210, 220, 220, 0.8);
+        }
+        
     </style>
 </head>
 <body>
